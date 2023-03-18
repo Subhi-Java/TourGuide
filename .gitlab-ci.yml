@@ -1,0 +1,26 @@
+# name of the Docker image, the Docker executor uses to run CI/CD jobs
+image: openjdk:17-alpine
+
+# Stages, which define when to run the jobs. For example, stages that run tests after stages that compile the code.
+stages:
+  - Build
+  - Test
+
+# build job in Build stage
+build:
+  stage: Build
+  script:
+    - ./gradlew bootJar
+  # The paths keyword determines which files to add to the job artifacts. All paths to files and directories are relative to the repository where the job was created.
+  artifacts:
+    paths:
+      - build/libs/*.jar
+    expire_in: 1 week
+
+# test job in Test stage
+test:
+  stage: Test
+  needs:
+    - build
+  script:
+    - ./gradlew check

@@ -1,0 +1,26 @@
+# Compiled class files
+/build/
+/classes/
+
+# Log files
+*.log
+
+# IntelliJ IDEA files
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Eclipse files
+.settings/
+*.project
+*.classpath
+bin/
+
+# Gradle files
+.gradle/
+build.gradle
+.gradle.lockfile
+gradlew
+gradlew.bat

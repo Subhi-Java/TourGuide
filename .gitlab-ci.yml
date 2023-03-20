@@ -1,40 +1,32 @@
-# name of the Docker image, the Docker executor uses to run CI/CD jobs
 image: openjdk:17-alpine
+  - build
+  - test
 
-# Stages, which define when to run the jobs. For example, stages that run tests after stages that compile the code.
-stages:
-  - Build
-  - Test
-  - Publish
-    
-# build job in Build stage
+cache:
+  paths:
+    - build
+    - .gradle
+
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  JACOCO_CSV_LOCATION: '$CI_PROJECT_DIR/build/jacocoCsv'
+
+before_script:
+  - GRADLE_USER_HOME="$(pwd)/.gradle"
+  - export GRADLE_USER_HOME
+  - chmod +x gradlew
+
 build:
-  stage: Build
-  script:
-    - chmod +x ./gradlew
-    - ./gradlew bootJar
+  stage: build
+  script: ./gradlew --build-cache assemble
   artifacts:
     paths:
       - build/libs/*.jar
-    expire_in: 1 week
-    
-# test job in Test stage
-test:
-  stage: Test
-  needs:
-    - build
-  before_script:
-    - chmod +x ./gradlew
-  script:
-    - ./gradlew check jacocoTestReport
 
-publish:
-  stage: Publish
-  needs:
-    - test
+test:
+  stage: test
+  script:
+    - ./gradlew test
+    - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, " instructions covered"; print 100*covered/instructions, "% covered" }' $JACOCO_CSV_LOCATION
   artifacts:
-    reports:
-      junit: build/test-results/test/TEST-*.xml
-    paths:
-      - build/reports/jacoco/test/html/
-    expire_in: 1 week
+    when: always

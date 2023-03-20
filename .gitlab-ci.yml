@@ -11,7 +11,7 @@ build:
   stage: Build
   script:
     - chmod +x ./gradlew
-    - ./gradlew build
+    - ./gradlew bootJar
 # The paths keyword determines which files to add to the job artifacts. All paths to files and directories are relative to the repository where the job was created.
   artifacts:
     paths:

@@ -5,6 +5,7 @@ image: openjdk:17-alpine
 stages:
   - Build
   - Test
+  - Publish
     
 # build job in Build stage
 build:
@@ -12,7 +13,6 @@ build:
   script:
     - chmod +x ./gradlew
     - ./gradlew bootJar
-# The paths keyword determines which files to add to the job artifacts. All paths to files and directories are relative to the repository where the job was created.
   artifacts:
     paths:
       - build/libs/*.jar
@@ -26,4 +26,15 @@ test:
   before_script:
     - chmod +x ./gradlew
   script:
-    - ./gradlew check
+    - ./gradlew check jacocoTestReport
+
+publish:
+  stage: Publish
+  needs:
+    - test
+  artifacts:
+    reports:
+      junit: build/test-results/test/TEST-*.xml
+    paths:
+      - build/reports/jacoco/test/html/
+    expire_in: 1 week

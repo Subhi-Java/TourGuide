@@ -1,51 +1,49 @@
-image: gradle:7.6-jdk17
-
-stages:
-  - build
-  - test
-  - visualize
-cache:
-  paths:
-    - build
-    - .gradle
-
-variables:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-
-before_script:
-  - GRADLE_USER_HOME="$(pwd)/.gradle"
-  - export GRADLE_USER_HOME
-  - chmod +x gradlew
-
-build:
-  stage: build
-  script: ./gradlew --build-cache assemble
-  artifacts:
-    paths:
-      - build/libs/*.jar
-
-test:
-  stage: test
-  script:
-    - gradle check
-    - gradle test jacocoTestReport # jacoco must be configured to create an xml report
-  artifacts:
-    paths:
-      - build/jacoco/jacoco.xml
-      - build/jacoco/test.exec
-  coverage: '/    - Instruction Coverage: ([0-9.]+)%/'
-
-visualize:
-  stage: visualize
   image: gradle:7.6-jdk17
-  before_script:
-    - apt-get update -qy && apt-get install -y ant
-    - wget https://github.com/cobertura/cobertura/archive/cobertura-2.1.1.tar.gz && tar -xf cobertura-2.1.1.tar.gz && rm cobertura-2.1.1.tar.gz
-    - cd cobertura-cobertura-2.1.1 && ant && cd ..
-  script:
-    - gradle test jacocoTestReport # jacoco must be configured to create an xml report
-    - java -jar cobertura-cobertura-2.1.1/cobertura.jar xml-report --output-file build/reports/cobertura/coverage.xml --datafile build/jacoco/test.exec
-  artifacts:
+
+  stages:
+    - build
+    - test
+    - visualize
+  cache:
     paths:
-      - build/reports/cobertura/coverage.xml
+      - build
+      - .gradle
+
+  variables:
+    GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+  before_script:
+    - GRADLE_USER_HOME="$(pwd)/.gradle"
+    - export GRADLE_USER_HOME
+    - chmod +x gradlew
+
+  build:
+    stage: build
+    script: ./gradlew --build-cache assemble
+    artifacts:
+      paths:
+        - build/libs/*.jar
+
+  test:
+    stage: test
+    script:
+      - gradle check
+      - gradle test jacocoTestReport # jacoco must be configured to create an xml report
+    artifacts:
+      paths:
+        - build/jacoco/jacoco.xml
+        - build/jacoco/test.exec
+    coverage: '/    - Instruction Coverage: ([0-9.]+)%/'
+
+  visualize:
+    stage: visualize
+    image: gradle:7.6-jdk17
+    script:
+      - gradle test jacocoTestReport # jacoco must be configured to create an xml report
+      - java -jar "$(gradle buildEnvironment | grep cobertura | awk '{print $2}')/cobertura.jar" xml-report --output-file build/reports/cobertura/coverage.xml --datafile build/jacoco/test.exec
+    needs: [ "test" ]
+    artifacts:
+      paths:
+        - build/reports/cobertura/coverage.xml
+
 

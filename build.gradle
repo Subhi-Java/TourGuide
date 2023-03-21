@@ -25,7 +25,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
     implementation 'org.javamoney:moneta:1.4.2'
     implementation 'com.jsoniter:jsoniter:0.9.23'
-
+    implementation 'net.sourceforge.cobertura:cobertura:2.1.1'
     implementation files('libs/gpsUtil.jar')
     implementation files('libs/RewardCentral.jar')
     implementation files('libs/TripPricer.jar')

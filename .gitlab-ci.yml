@@ -2,6 +2,7 @@ image: openjdk:17-alpine
 stages:
   - build
   - test
+  - coverage
 cache:
   paths:
     - build
@@ -9,7 +10,6 @@ cache:
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-  JACOCO_CSV_LOCATION: '$CI_PROJECT_DIR/build/jacocoCsv'
 
 before_script:
   - GRADLE_USER_HOME="$(pwd)/.gradle"
@@ -26,9 +26,13 @@ build:
 test:
   stage: test
   script:
-    - ./gradlew test --stacktrace
-    - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, " instructions covered"; print 100*covered/instructions, "% covered" }' $JACOCO_CSV_LOCATION
+    - ./gradlew test
+
+jacocoTestReport:
+  stage: coverage
+  script:
+    - ./gradlew test jacocoTestReport
   artifacts:
-        when: always
-
-
+    paths:
+      - build/reports/jacoco/test/html/
+  coverage: '/Total instruction coverage:.+(\d+\.\d+)/'

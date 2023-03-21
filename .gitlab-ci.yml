@@ -1,4 +1,8 @@
 image: openjdk:17-alpine
+check_gradle_version:
+  image: openjdk:17-alpine
+  script:
+    - gradle --version
 stages:
   - build
   - test

@@ -26,8 +26,9 @@ build:
 
 test:
   stage: test
-  script: gradle check
-    - 'gradle test jacocoTestReport' # jacoco must be configured to create an xml report
+  script:
+    - gradle check
+    - gradle test jacocoTestReport # jacoco must be configured to create an xml report
   artifacts:
     paths:
       - build/jacoco/jacoco.xml
@@ -42,7 +43,7 @@ visualize:
     - wget https://github.com/cobertura/cobertura/archive/cobertura-2.1.1.tar.gz && tar -xf cobertura-2.1.1.tar.gz && rm cobertura-2.1.1.tar.gz
     - cd cobertura-cobertura-2.1.1 && ant && cd ..
   script:
-    - 'gradle jacocoTestReport' # jacoco must be configured to create an xml report
+    - gradle test jacocoTestReport # jacoco must be configured to create an xml report
     - java -jar cobertura-cobertura-2.1.1/cobertura.jar xml-report --output-file build/reports/cobertura/coverage.xml --datafile build/jacoco/test.exec
   artifacts:
     paths:

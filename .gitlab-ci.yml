@@ -27,4 +27,10 @@ build:
 test:
   stage: test
   script: gradle check
+    - 'gradle test jacocoTestReport' # jacoco must be configured to create an xml report
+  artifacts:
+    paths:
+      - build/jacoco/jacoco.xml
   coverage: '/    - Instruction Coverage: ([0-9.]+)%/'
+
+

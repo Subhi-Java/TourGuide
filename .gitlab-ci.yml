@@ -3,7 +3,7 @@ image: gradle:7.6-jdk17
 stages:
   - build
   - test
-
+  - visualize
 cache:
   paths:
     - build
@@ -31,6 +31,20 @@ test:
   artifacts:
     paths:
       - build/jacoco/jacoco.xml
+      - build/jacoco/test.exec
   coverage: '/    - Instruction Coverage: ([0-9.]+)%/'
 
+visualize:
+  stage: visualize
+  image: gradle:7.6-jdk17
+  before_script:
+    - apt-get update -qy && apt-get install -y ant
+    - wget https://github.com/cobertura/cobertura/archive/cobertura-2.1.1.tar.gz && tar -xf cobertura-2.1.1.tar.gz && rm cobertura-2.1.1.tar.gz
+    - cd cobertura-cobertura-2.1.1 && ant && cd ..
+  script:
+    - 'gradle jacocoTestReport' # jacoco must be configured to create an xml report
+    - java -jar cobertura-cobertura-2.1.1/cobertura.jar xml-report --output-file build/reports/cobertura/coverage.xml --datafile build/jacoco/test.exec
+  artifacts:
+    paths:
+      - build/reports/cobertura/coverage.xml
 

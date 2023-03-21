@@ -27,4 +27,4 @@ build:
 test:
   stage: test
   script: gradle check
-  coverage: '/    - Instruction Coverage: ([0-9.]+)%/'
+  coverage: '/  - Instruction Coverage: ([0-9.]+)%/'

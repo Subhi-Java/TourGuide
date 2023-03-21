@@ -1,31 +1,12 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.7.8")
-    }
-}
 plugins {
-    id 'java'
+    id 'org.springframework.boot' version '2.7.8'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
     id 'jacoco'
-    id 'application'
+    id 'java-library'
 }
 
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
-apply plugin: 'java-library'
-
-
-/*tasks.named('bootJar') {
-    archiveBaseName = 'tourGuide'
-    version =  '1.0.0'
-}*/
-version = '1.0.0'
 group = 'tourGuide'
-mainClassName='tourGuide.Application'
+version = '1.0.0'
 
 repositories {
     mavenCentral()
@@ -36,71 +17,51 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.2'
-
-
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
     implementation 'org.javamoney:moneta:1.4.2'
-    implementation group: 'com.jsoniter', name: 'jsoniter', version: '0.9.23'
+    implementation 'com.jsoniter:jsoniter:0.9.23'
 
     implementation files('libs/gpsUtil.jar')
     implementation files('libs/RewardCentral.jar')
     implementation files('libs/TripPricer.jar')
-
-    /*implementation fileTree(include: ['*.jar'], dir: 'libs')*/
-
 }
 
-
 jacoco {
-    toolVersion = "0.8.8"
-    reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
+    toolVersion = '0.8.8'
+    reportsDirectory = file("$buildDir/customJacocoReportDir")
 }
 
 jacocoTestReport {
     reports {
-        xml.required = false
-        csv.required = false
-        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+        html.enabled true
+        xml.enabled false
+        csv.enabled false
+        html.destination file("$buildDir/jacocoHtml")
     }
+    dependsOn test
 }
-
-test.finalizedBy jacocoTestReport
-check.dependsOn jacocoTestCoverageVerification
 
 jacocoTestCoverageVerification {
-  violationRules {
-    rule {
-      limit {
-        counter = 'LINE'
-        value = 'COVEREDRATIO'
-        minimum = 0.4
-      }
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.4
+            }
+        }
     }
-  }
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
-}
 test {
-    finalizedBy jacocoTestReport // report is always generated after tests run
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
-jacocoTestReport {
-    dependsOn test // tests are required to run before generating the report
-}
-application {
-    // Define the main class for the application.
-    mainClass = 'tourGuide.Application'
-}
+
 jar {
     manifest {
-        // This code adds the Main-Class attribute to the manifest property of the jar task.
-        // add the required attribute when generating an archive(contain the Main-Class attribute in the MANIFEST.MF)for the application
-        attributes("Main-Class": "tourGuide.Application")
+        attributes 'Main-Class': 'tourGuide.Application'
     }
 }

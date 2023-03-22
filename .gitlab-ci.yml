@@ -24,7 +24,7 @@ test:
   stage: test
   script:
     #-./gradlew test
-    -./gradlew jacocoTestReport
+    - gradle test jacocoTestReport
   artifacts:
     paths:
       - build/jacoco/jacoco.xml

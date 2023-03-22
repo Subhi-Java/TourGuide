@@ -59,7 +59,7 @@ jacocoTestCoverageVerification {
 
 test {
     useJUnitPlatform()
-    finalizedBy jacocoTestReport
+    finalizedBy("jacocoTestReport")
 }
 
 jar {

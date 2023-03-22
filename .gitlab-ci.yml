@@ -1,4 +1,4 @@
-image: gradle:7.6.0-jdk17-alpine
+image: gradle:7.6-jdk17-alpine
 
 stages:
   - build
@@ -37,20 +37,20 @@ test:
 
 jacocoTest:
   stage: jacocoTest
-  #image: gradle:7.6.0-jdk17-alpine
+  image: gradle:7.6-jdk17-alpine
   script:
     - gradle test jacocoTestReport # jacoco must be configured to create an xml report
   artifacts:
     paths:
-      - build/jacoco/jacoco.xml
+      - code_coverage/jacoco/jacoco.xml
 
 coverage-jacoco:
   stage: visualize
   image: registry.gitlab.com/haynes/jacoco2cobertura:1.0.7
   script:
       # convert report from jacoco to cobertura, using relative project path
-      - python /opt/cover2cover.py build/jacoco/jacoco.xml $CI_PROJECT_DIR/src/main/java/ > build/cobertura.xml
-  needs: [ "jacocoTest" ]
+      - python /opt/cover2cover.py code_coverage/jacoco/jacoco.xml $CI_PROJECT_DIR/src/main/java/ > build/cobertura.xml
+  needs: ["jacocoTest"]
   artifacts:
       reports:
         coverage_report:

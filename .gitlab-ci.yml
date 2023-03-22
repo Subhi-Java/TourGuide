@@ -2,7 +2,6 @@ image: gradle:7.6-jdk17
 stages:
   - build
   - test
-  - test_unit
 cache:
   paths:
     - build
@@ -24,7 +23,7 @@ build:
 test:
   stage: test
   script:
-    #-./gradlew test
+    - ./gradlew :test --tests "tourGuide.**"
     - gradle test jacocoTestReport
   artifacts:
     paths:
@@ -33,12 +32,5 @@ test:
       - build/jacocoHtml/index.html
   coverage: '/ - Instruction Coverage: ([0-9.]+)%/'
 
-test_unit:
-  stage: test_unit
-  script:
-    - ./gradlew :test --tests "tourGuide.**"
-  artifacts:
-   paths:
-     - build/report-tests/test/Test-*.xml
 
 

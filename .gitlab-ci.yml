@@ -30,8 +30,8 @@ test:
   stage: test
   script:
     - gradle check
-    - cat build/reports/tests/test/**/TEST-*.xml
-    - cat build/reports/tests/test/**/index.html
+    - build/reports/tests/test/**/TEST-*.xml
+    - build/reports/tests/test/**/index.html
   artifacts:
     reports:
       junit:
@@ -44,8 +44,8 @@ jacocoTest:
   image: gradle:7.6-jdk17-alpine
   script:
     - 'gradle test jacocoTestReport' # jacoco must be configured to create an xml report
-    - cat build/jacoco/jacoco.xml
-    - cat build/jacocoHtml/index.xml
+    - build/jacoco/jacoco.xml
+    - build/jacocoHtml/index.xml
   artifacts:
     paths:
       - build/jacoco/jacoco.xml

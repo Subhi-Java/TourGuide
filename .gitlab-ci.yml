@@ -2,6 +2,7 @@ image: gradle:7.6-jdk17-alpine
 
 stages:
   - build
+  - unit_test
   - test
   - jacocoTest
   - visualize
@@ -19,6 +20,21 @@ before_script:
   - export GRADLE_USER_HOME
   - chmod +x gradlew
 
+unit_test:
+  stage: unit_test
+  script:
+    - ./gradlew :test --tests "tour-guide-p8.**Test"
+  allow_failure: true
+  artifacts:
+      when: always
+      paths:
+        - build/jacocoHtml
+        - build/reports
+        - build/jacoco/test.exec
+      expire_in: 2 week
+      reports:
+        junit: build/test-results/test/TEST-*.xml
+
 build:
   stage: build
   script: gradle --build-cache assemble
@@ -30,14 +46,11 @@ test:
   stage: test
   script:
     - gradle check
-    - build/reports/tests/test/**/TEST-*.xml
-    - build/reports/tests/test/**/index.html
+    - build/test-results/test/TEST-*.xml
   artifacts:
     reports:
       junit:
-      - build/reports/tests/test/**/TEST-*.xml
-      - build/reports/tests/test/**/index.html
-
+      - build/test-results/test/TEST-*.xml
 
 jacocoTest:
   stage: jacocoTest
@@ -45,12 +58,9 @@ jacocoTest:
   script:
     - 'gradle test jacocoTestReport' # jacoco must be configured to create an xml report
     - build/jacoco/jacoco.xml
-    - build/jacocoHtml/index.xml
   artifacts:
     paths:
       - build/jacoco/jacoco.xml
-      - build/jacocoHtml/index.xml
-
 coverage-jacoco:
   stage: visualize
   image: registry.gitlab.com/haynes/jacoco2cobertura:1.0.7

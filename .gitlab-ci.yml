@@ -27,7 +27,7 @@ build:
 test:
   stage: test
   script:
-    - ./gradlew :test --tests "tourGuide"
+    - ./gradlew :test --tests "tourGuide.**"
   allow_failure: true
   artifacts:
       when: always

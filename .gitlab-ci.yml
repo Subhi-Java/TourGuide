@@ -1,4 +1,4 @@
-image: gradle:7.6-jdk17
+image: gradle:7.6-jdk17-alpine
 
 stages:
   - build
@@ -27,7 +27,7 @@ build:
 test:
   stage: test
   script:
-    - ./gradlew clean test jacocoTestReport
+    - gradle clean test jacocoTestReport
   artifacts:
     paths:
       - build/reports/jacoco/test/html/

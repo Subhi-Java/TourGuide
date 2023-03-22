@@ -1,21 +1,17 @@
-image: gradle:7.6-jdk17-alpine
-
+image: gradle:7.6-jdk17
 stages:
   - build
   - test
-
+  - visualize
 cache:
   paths:
     - build
     - .gradle
-
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-
 before_script:
   - GRADLE_USER_HOME="$(pwd)/.gradle"
-  - export GRADLE_USER_HOME
-  - chmod +x gradlew
+  - export GRADLE_USER_HOME - chmod +x gradlew
 
 build:
   stage: build
@@ -23,12 +19,28 @@ build:
   artifacts:
     paths:
       - build/libs/*.jar
+
 test:
   stage: test
-  script: ./gradlew check ./gradlew test jacocoTestReport # jacoco must be configured to create an xml report
+  script:
+    - gradle check
+    - gradle test jacocoTestReport # jacoco must be configured to create an xml report
   artifacts:
     paths:
       - build/jacoco/jacoco.xml
-  coverage: '/    - Instruction Coverage: ([0-9.]+)%/'
+      - build/jacoco/test.exec
+  coverage: '/ - Instruction Coverage: ([0-9.]+)%/'
+
+visualize:
+  stage: visualize
+  image: gradle:7.6-jdk17
+  script:
+    - gradle test jacocoTestReport # jacoco must be configured to create an xml report
+    - java -jar "$(gradle buildEnvironment | grep cobertura | awk '{print $2}')/cobertura.jar" xml-report --output-file build/reports/cobertura/coverage.xml
+    - datafile build/jacoco/test.exec
+  needs: [ "test" ]
+  artifacts:
+    paths:
+      - build/reports/cobertura/coverage.xml
 
 

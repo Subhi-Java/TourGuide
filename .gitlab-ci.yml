@@ -37,9 +37,9 @@ test:
 
 jacocoTest:
   stage: jacocoTest
-  image: gradle:7.6.0-jdk17-alpine
+  #image: gradle:7.6.0-jdk17-alpine
   script:
-    - 'gradle test jacocoTestReport' # jacoco must be configured to create an xml report
+    - gradle test jacocoTestReport # jacoco must be configured to create an xml report
   artifacts:
     paths:
       - build/jacoco/jacoco.xml

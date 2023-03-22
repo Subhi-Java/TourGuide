@@ -23,6 +23,7 @@ build:
   artifacts:
     paths:
       - build/libs/*.jar
+    expire_in: 2 weeks
 
 test:
   stage: test
@@ -31,11 +32,13 @@ test:
   artifacts:
     paths:
       - build/reports
+    expire_in: 2 weeks
 
 jacoco_coverage:
   stage: coverage
   script:
-    - './gradlew clean test jacocoTestReport'
+    - 'gradle clean test jacocoTestReport'
   artifacts:
     paths:
       - build/jacocoHtml
+    expire_in: 2 weeks

@@ -5,7 +5,6 @@ stages:
   - unit_test
   - test
   - jacocoTest
-  - visualize
 
 cache:
   paths:
@@ -19,6 +18,12 @@ before_script:
   - GRADLE_USER_HOME="$(pwd)/.gradle"
   - export GRADLE_USER_HOME
   - chmod +x gradlew
+build:
+  stage: build
+  script: gradle --build-cache assemble
+  artifacts:
+    paths:
+      - build/libs/*.jar
 
 unit_test:
   stage: unit_test
@@ -34,13 +39,6 @@ unit_test:
       expire_in: 2 week
       reports:
         junit: build/test-results/test/TEST-*.xml
-
-build:
-  stage: build
-  script: gradle --build-cache assemble
-  artifacts:
-    paths:
-      - build/libs/*.jar
 
 test:
   stage: test
@@ -61,16 +59,3 @@ jacocoTest:
   artifacts:
     paths:
       - build/jacoco/jacoco.xml
-coverage-jacoco:
-  stage: visualize
-  image: registry.gitlab.com/haynes/jacoco2cobertura:1.0.7
-  script:
-      # convert report from jacoco to cobertura, using relative project path
-      - python /opt/cover2cover.py build/jacoco/jacoco.xml $CI_PROJECT_DIR/src/main/java/ > build/cobertura.xml
-  needs: ["jacocoTest"]
-  artifacts:
-      reports:
-        coverage_report:
-          coverage_format: cobertura
-          path: build/cobertura.xml
-

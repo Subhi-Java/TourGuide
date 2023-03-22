@@ -36,7 +36,7 @@ test:
 test_unit:
   stage: test_unit
   script:
-    - ./gradlew :test "tourGuide.**"
+    - ./gradlew :test --tests "tourGuide.**"
   artifacts:
    paths:
      - build/report-tests/test/Test-*.xml

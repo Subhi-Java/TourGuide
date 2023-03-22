@@ -28,7 +28,7 @@ build:
 jacoco_coverage:
   stage: coverage
   script:
-    - './gradlew clean test jacocoTestReport'
+    - 'gradle clean test jacocoTestReport'
   artifacts:
     paths:
       - build/jacocoHtml
@@ -37,7 +37,7 @@ jacoco_coverage:
 test:
   stage: test
   script:
-    - './gradlew :test --tests "tourGuide.**"'
+    - ./gradlew :test --tests "tourGuide.**"
   artifacts:
     paths:
       - build/reports

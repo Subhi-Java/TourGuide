@@ -3,12 +3,11 @@ image: gradle:7.6-jdk17-alpine
 stages:
   - build
   - test
-  - jacocoTest
 
 cache:
   paths:
-    - .gradle/wrapper
-    - .gradle/caches
+    - build
+    - .gradle
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
@@ -17,34 +16,20 @@ before_script:
   - GRADLE_USER_HOME="$(pwd)/.gradle"
   - export GRADLE_USER_HOME
   - chmod +x gradlew
+
 build:
   stage: build
   script: ./gradlew --build-cache assemble
   artifacts:
     paths:
       - build/libs/*.jar
-
 test:
   stage: test
-  script:
-    - ./gradlew :test --tests "tourGuide.**"
-    - ./gradlew dependencies
-  allow_failure: true
-  artifacts:
-      when: always
-      paths:
-        - build/jacocoHtml
-        - build/reports
-        - build/jacoco/test.exec
-      expire_in: 2 weeks
-      reports:
-        junit: build/test-results/test/TEST-*.xml
-
-jacocoTest:
-  stage: jacocoTest
-  image: gradle:7.6-jdk17-alpine
-  script:
+  script: ./gradlew check
     - ./gradlew test jacocoTestReport # jacoco must be configured to create an xml report
   artifacts:
     paths:
       - build/jacoco/jacoco.xml
+  coverage: '/    - Instruction Coverage: ([0-9.]+)%/'
+
+

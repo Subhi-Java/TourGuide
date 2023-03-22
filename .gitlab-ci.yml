@@ -29,10 +29,11 @@ test:
   stage: test
   script:
     - ./gradlew :test --tests "tourGuide.**"
-    - './gradlew clean test jacocoTestReport'
   artifacts:
     paths:
       - build/reports
+      - build/jacoco
+      - build/jacocoHtml
     expire_in: 2 weeks
     reports:
       junit: build/test-results/test/TEST-*.xml
@@ -40,7 +41,7 @@ test:
 jacoco_coverage:
   stage: coverage
   script:
-    - 'gradle clean test jacocoTestReport'
+    - './gradlew clean test jacocoTestReport'
   artifacts:
     paths:
       - build/jacocoHtml

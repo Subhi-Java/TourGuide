@@ -31,4 +31,5 @@ test:
   artifacts:
     paths:
       - build/jacocoHtml
+      - build/reports
   coverage: '/Total.*([0-9]{1,3}\%)/'

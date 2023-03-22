@@ -2,7 +2,6 @@ image: gradle:7.6-jdk17
 stages:
   - build
   - test
-  - visualize
 cache:
   paths:
     - build
@@ -24,24 +23,13 @@ build:
 test:
   stage: test
   script:
-    - gradle check
-    - gradle test jacocoTestReport # jacoco must be configured to create an xml report
+    - ./gradlew test
+    - ./gradle test jacocoTestReport
   artifacts:
     paths:
       - build/jacoco/jacoco.xml
       - build/jacoco/test.exec
   coverage: '/ - Instruction Coverage: ([0-9.]+)%/'
 
-visualize:
-  stage: visualize
-  image: gradle:7.6-jdk17
-  script:
-    - gradle test jacocoTestReport # jacoco must be configured to create an xml report
-    - java -jar "$(gradle buildEnvironment | grep cobertura | awk '{print $2}')/cobertura.jar" xml-report --output-file build/reports/cobertura/coverage.xml
-    - datafile build/jacoco/test.exec
-  needs: [ "test" ]
-  artifacts:
-    paths:
-      - build/reports/cobertura/coverage.xml
 
 

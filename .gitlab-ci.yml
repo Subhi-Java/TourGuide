@@ -2,8 +2,8 @@ image: gradle:7.6-jdk17-alpine
 
 stages:
   - build
-  - coverage
-  - test
+  - test-coverage
+  -
 cache:
   paths:
     - .gradle/wrapper
@@ -25,25 +25,18 @@ build:
       - build/libs/*.jar
     expire_in: 2 weeks
 
-jacoco_coverage:
-  stage: coverage
+test-coverage:
+  stage: test-coverage
   script:
     - 'gradle clean test jacocoTestReport'
-  artifacts:
-    paths:
-      - build/jacocoHtml
-    expire_in: 2 weeks
-
-test:
-  stage: test
-  script:
     - ./gradlew :test --tests "tourGuide.**"
   artifacts:
     paths:
-      - build/reports
-      - build/jacoco
       - build/jacocoHtml
+      - build/jacoco
+      - build/reports
     expire_in: 2 weeks
     reports:
       junit: build/test-results/test/TEST-*.xml
+
 

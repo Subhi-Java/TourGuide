@@ -1,13 +1,17 @@
 image: gradle:7.6-jdk17
+
 stages:
   - build
   - test
+
 cache:
   paths:
     - build
     - .gradle
+
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
 before_script:
   - GRADLE_USER_HOME="$(pwd)/.gradle"
   - export GRADLE_USER_HOME
@@ -23,14 +27,10 @@ build:
 test:
   stage: test
   script:
-    - ./gradlew :test --tests "tourGuide.**"
-    - ./gradlew test jacocoTestReport
+    - ./gradlew clean test jacocoTestReport
   artifacts:
     paths:
-      - build/jacoco/jacoco.xml
-      - build/jacoco/test.exec
-      - build/jacocoHtml/index.html
-  coverage: '/ - Instruction Coverage: ([0-9.]+)%/'
-
-
-
+      - build/reports/jacoco/test/html/
+      - build/reports/jacoco/test/xml/
+      - build/reports/jacoco/test/jacocoTestReport.xml
+  coverage: '/Total.*([0-9]{1,3}\%)/'

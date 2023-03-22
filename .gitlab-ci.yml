@@ -27,7 +27,7 @@ build:
 test:
   stage: test
   script:
-    - ./gradlew :test --tests "tourGuide.**Test"
+    - ./gradlew :test --tests "tourGuide"
   allow_failure: true
   artifacts:
       when: always
@@ -44,7 +44,6 @@ jacocoTest:
   image: gradle:7.6-jdk17-alpine
   script:
     - 'gradle test jacocoTestReport' # jacoco must be configured to create an xml report
-    - build/jacoco/jacoco.xml
   artifacts:
     paths:
       - build/jacoco/jacoco.xml

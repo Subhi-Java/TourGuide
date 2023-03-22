@@ -6,8 +6,8 @@ stages:
 
 cache:
   paths:
-    - build
-    - .gradle
+    - .gradle/wrapper
+    - .gradle/caches
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
@@ -27,9 +27,8 @@ build:
 test:
   stage: test
   script:
-    - gradle clean test jacocoTestReport
+    - 'gradle clean test jacocoTestReport'
   artifacts:
     paths:
       - build/jacocoHtml
       - build/reports
-  coverage: '/Total.*([0-9]{1,3}\%)/'

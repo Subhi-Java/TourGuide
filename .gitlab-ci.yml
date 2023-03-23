@@ -28,13 +28,15 @@ build:
 test-coverage:
   stage: test-coverage
   script:
-    - ./gradlew :test --tests "tourGuide.**"
     - 'gradle clean test jacocoTestReport'
+    - ./gradlew :test --tests "tourGuide.**"
   artifacts:
     paths:
       - build/jacocoHtml
       - build/reports
     expire_in: 2 weeks
+    reports:
+      junit: build/test-results
 
 
 

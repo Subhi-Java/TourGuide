@@ -3,7 +3,6 @@ image: gradle:7.6-jdk17-alpine
 stages:
   - build
   - test-coverage
-
 cache:
   paths:
     - build
@@ -24,10 +23,10 @@ build:
   artifacts:
     paths:
       - build/libs/*.jar
-    only:
-      develop
-    expire_in: 2 weeks
 
+    expire_in: 2 weeks
+  only:
+    - develop
 test-coverage:
   stage: test-coverage
   script:
@@ -36,9 +35,10 @@ test-coverage:
     paths:
       - build/jacocoHtml
       - build/reports
-    only:
-          develop
+
     expire_in: 2 weeks
+  only:
+    - develop
 
 
 

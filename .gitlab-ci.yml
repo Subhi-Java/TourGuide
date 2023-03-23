@@ -25,19 +25,16 @@ build:
       - build/libs/*.jar
     expire_in: 2 weeks
 
-testCoverage:
+test-coverage:
   stage: test-coverage
   script:
     - ./gradlew :test --tests "tourGuide.**"
     - 'gradle clean test jacocoTestReport'
   artifacts:
     paths:
-      - build/jacoco
       - build/jacocoHtml
       - build/reports
-
     expire_in: 2 weeks
-    reports:
-      junit: build/test-results/test/TEST-*.xml
+
 
 

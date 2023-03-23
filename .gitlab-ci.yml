@@ -2,12 +2,12 @@ image: gradle:7.6-jdk17-alpine
 
 stages:
   - build
-  - testCoverage
+  - test-coverage
 
 cache:
   paths:
-    - .gradle/wrapper
-    - .gradle/caches
+    - build
+    - .gradle
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
@@ -26,14 +26,16 @@ build:
     expire_in: 2 weeks
 
 testCoverage:
-  stage: testCoverage
+  stage: test-coverage
   script:
     - ./gradlew :test --tests "tourGuide.**"
     - 'gradle clean test jacocoTestReport'
   artifacts:
     paths:
+      - build/jacoco
       - build/jacocoHtml
       - build/reports
+
     expire_in: 2 weeks
     reports:
       junit: build/test-results/test/TEST-*.xml

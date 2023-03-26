@@ -68,7 +68,12 @@ public class TourGuideService {
         logger.info("Retrieve successfully user lastVisitedLocation if exists, if not track user current location");
         return visitedLocation;
     }
-
+    /**
+     * Retrieves a user by their username from the internal user map.
+     * @param userName the username of the user to retrieve
+     * @return the User object corresponding to the given username
+     * @throws UserNotFoundException if a user with the given username does not exist in the internal user map
+     */
     public User getUser(String userName) {
         User user = internalUserMap.get(userName);
         if (user == null) {
@@ -109,7 +114,7 @@ public class TourGuideService {
 
 
     /**
-     * Return the Map : Key is userId, value is Location
+     * Return the Map of all current locations of all users. Key is userId, value is Location
      *
      * @return CompletableFuture
      */
@@ -119,20 +124,36 @@ public class TourGuideService {
                 user -> new Location(user.getLastVisitedLocation().location.longitude, user.getLastVisitedLocation().location.latitude)));
     }
 
+    /**
+     *
+     * Gets trip deals for the specified user based on their preferences and reward points.
+     * Calls tripPricer service, to retrieve available trip deals.
+     * @param user User
+     * @return A list of Provider objects containing information about available trip deals.
+     */
     public List<Provider> getTripDeals(User user) {
-        int cumulativeRewardPoints = user.getUserRewards().stream().mapToInt(UserReward::getRewardPoints).sum();//i -> i.getRewardPoints()
+        int cumulativeRewardPoints = user.getUserRewards().stream().mapToInt(UserReward::getRewardPoints).sum();
+
         List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(), user.getUserPreferences().getNumberOfAdults(),
                 user.getUserPreferences().getNumberOfChildren(), user.getUserPreferences().getTripDuration(), cumulativeRewardPoints);
+
         user.setTripDeals(providers);
         return providers;
     }
 
+    /**
+     * Asynchronously tracks a user's location and updates the visited locations list.
+     * It also calculates the user's rewards for visiting the location and returns the current visited location.
+     * @param user the user whose location is being tracked
+     * @return CompletableFuture VisitedLocation that supplies the user's current visited location
+     */
     public CompletableFuture<VisitedLocation> trackUserLocation(User user) {
         //logger.debug("trackUserLocation from TourGuideService, user:{}, currentThread: {}", user.getUserName(), Thread.currentThread().getName());
         return CompletableFuture.supplyAsync(() -> {
                    // logger.debug(Thread.currentThread().getName() + " is working");
            return gpsUtil.getUserLocation(user.getUserId());
                         }, trackUserExecutorService)
+
                 .thenApplyAsync(visitedLocation -> {
                     //logger.debug("addToVisitedLocation, user: {}, currentThread: {}", user.getUserName(), Thread.currentThread().getName());
                     user.addToVisitedLocations(visitedLocation);
@@ -140,7 +161,11 @@ public class TourGuideService {
                     return visitedLocation;
                 }, trackUserExecutorService);
     }
-
+    /**
+     * Get the list of the nearest 5 attractions from a given location
+     * @param visitedLocation the location visited by the user
+     * @return the list of the 5 nearest attractions
+     */
     public List<NearAttractionDTO> getNearByAttractions(VisitedLocation visitedLocation) {
         int attractionsNearest = 5;
         return gpsUtil.getAttractions()

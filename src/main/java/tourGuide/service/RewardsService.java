@@ -19,12 +19,12 @@ import tourGuide.user.UserReward;
 @Service
 public class RewardsService {
     private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
-    private Logger logger = LoggerFactory.getLogger(RewardsService.class);
+    private static final Logger logger = LoggerFactory.getLogger(RewardsService.class);
 
     // proximity in miles
-    private int defaultProximityBuffer = 10;
+    private final int defaultProximityBuffer = 10;
     private int proximityBuffer = defaultProximityBuffer;
-    private int attractionProximityRange = 200;
+    private final int attractionProximityRange = 200;
     private final GpsUtil gpsUtil;
     private final RewardCentral rewardsCentral;
     private final ExecutorService calculateExecutorService = Executors.newFixedThreadPool(100);
@@ -42,7 +42,16 @@ public class RewardsService {
         proximityBuffer = defaultProximityBuffer;
     }
 
-
+    /**
+     * Calculates rewards for a given user based on their visited locations and proximity to attractions.
+     * @param user  User for which to calculate rewards.
+     * It retrieves the user's visited locations and the list of all attractions
+     * It then iterates over each attraction and visited location, checking if the attraction is within proximity of the location.
+     * If it is, a UserReward object is created for that attraction and location and the reward points for that attraction.
+     * The UserReward object is then added to the user's list of rewards.
+     * All of these operations are performed asynchronously using CompletableFutures.
+     * Finally, the method waits for all the CompletableFuture objects to complete before returning.
+     */
     public void calculateRewards(User user) {
         List<VisitedLocation> userLocations = user.getVisitedLocations();
 
@@ -68,15 +77,33 @@ public class RewardsService {
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
     }
 
-
+    /**
+     * Checks if the given location is within the proximity range of the attraction.
+     *
+     * @param attraction the attraction to check proximity for
+     * @param location the location to check
+     * @return true if the location is within the proximity range, false otherwise
+     */
     public boolean isWithinAttractionProximity(Attraction attraction, Location location) {
         return !(getDistance(attraction, location) > attractionProximityRange);
     }
-
+    /**
+     * Checks if a visited location is within proximity to an attraction.
+     * @param visitedLocation the visited location to check
+     * @param attraction the attraction to compare against
+     * @return true if the visited location is within proximity to the attraction, false otherwise
+     */
     private boolean nearAttraction(VisitedLocation visitedLocation, Attraction attraction) {
         return !(getDistance(attraction, visitedLocation.location) > proximityBuffer);
     }
 
+
+    /**
+     * Calculates the reward points for a user visiting an attraction based on the attraction's ID and the user's ID.
+     * @param attraction The attraction for which the reward points are being calculated.
+     * @param user The user for whom the reward points are being calculated.
+     * @return The reward points calculated for the user visiting the attraction.
+     */
     private int getRewardPoints(Attraction attraction, User user) {
         return rewardsCentral.getAttractionRewardPoints(attraction.attractionId, user.getUserId());
     }

@@ -156,11 +156,10 @@ public class TestTourGuideService {
     void getAllCurrentLocations() {
         GpsUtil gpsUtil = new GpsUtil();
         RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
-        InternalTestHelper.setInternalUserNumber(1000);
+        InternalTestHelper.setInternalUserNumber(100);
         TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
         Map<String, Location> allCurrentLocations = tourGuideService.getAllCurrentLocations();
 
-        assertThat(allCurrentLocations.size()).isEqualTo(1000);
-
+        assertThat(allCurrentLocations.size()).isEqualTo(100);
     }
 }

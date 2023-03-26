@@ -68,6 +68,12 @@ public class User {
         visitedLocations.clear();
     }
 
+    /**
+     * Add UserReward to the UserRewards' list
+     * If the attraction associated with the reward is already present in the list, it is not added again.
+     * The method uses a CopyOnWriteArrayList to avoid concurrency issues when adding or removing user rewards.
+     * @param userReward UserReward
+     */
     public void addUserReward(UserReward userReward) {
     /*     if(userRewards.stream().filter(r -> !r.attraction.attractionName.equals(userReward.attraction.attractionName)).count() == 0) {
             userRewards.add(userReward);
@@ -93,6 +99,12 @@ public class User {
         this.userPreferences = userPreferences;
     }
 
+    /**
+     * Returns the user's last visited location based on the timestamp of the visited
+     * location. If the user has not visited any locations, a new VisitedLocation object
+     * will be created
+     * @return user's last visited location - VisitedLocation
+     */
     public VisitedLocation getLastVisitedLocation() {
         /*try {
             VisitedLocation lastVisitedLocation = Collections.max(visitedLocations, Comparator.comparing(lastLocation -> lastLocation.timeVisited));

@@ -1,6 +1,8 @@
 image: gradle:7.6-jdk17-alpine
 
 stages:
+  - compile
+  - test
   - build
   - test-coverage
 cache:
@@ -16,6 +18,12 @@ before_script:
   - export GRADLE_USER_HOME
   - chmod +x gradlew
 
+compile:
+  stage: compile
+  script: ./gradlew compileJava
+  only:
+    - develop
+
 build:
   stage: build
   script:
@@ -27,6 +35,14 @@ build:
     expire_in: 2 weeks
   only:
     - develop
+
+test:
+  stage: test
+  script: ./gradle check
+  artifacts:
+    reports:
+      junit: build/test-results/test/**/TEST-*.xml
+
 test-coverage:
   stage: test-coverage
   script:

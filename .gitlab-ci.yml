@@ -7,8 +7,8 @@ stages:
   - test-coverage
 cache:
   paths:
-    - build
-    - .gradle
+    - .gradle/wrapper
+    - .gradle/caches
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
@@ -25,13 +25,12 @@ compile:
     - develop
 
 build:
-  stage: assemble
+  stage: build
   script:
     - ./gradlew --build-cache assemble
   artifacts:
     paths:
       - build/libs/*.jar
-
     expire_in: 2 weeks
   only:
     - develop

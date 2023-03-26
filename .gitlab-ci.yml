@@ -38,7 +38,7 @@ build:
 
 test:
   stage: test
-  script: ./gradle check
+  script: ./gradlew check
   artifacts:
     reports:
       junit: build/test-results/test/**/TEST-*.xml

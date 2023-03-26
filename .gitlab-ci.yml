@@ -10,9 +10,6 @@ cache:
     - .gradle/wrapper
     - .gradle/caches
 
-variables:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-
 before_script:
   - GRADLE_USER_HOME="$(pwd)/.gradle"
   - export GRADLE_USER_HOME
@@ -24,6 +21,13 @@ compile:
   only:
     - develop
 
+test:
+  stage: test
+  script: ./gradlew check
+  artifacts:
+    reports:
+      junit: build/test-results/test/**/TEST-*.xml
+
 build:
   stage: build
   script:
@@ -34,13 +38,6 @@ build:
     expire_in: 2 weeks
   only:
     - develop
-
-test:
-  stage: test
-  script: ./gradlew check
-  artifacts:
-    reports:
-      junit: build/test-results/test/**/TEST-*.xml
 
 test-coverage:
   stage: test-coverage

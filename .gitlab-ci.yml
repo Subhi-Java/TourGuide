@@ -25,7 +25,7 @@ compile:
     - develop
 
 build:
-  stage: build
+  stage: assemble
   script:
     - ./gradlew --build-cache assemble
   artifacts:

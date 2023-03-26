@@ -30,25 +30,36 @@ dependencies {
     implementation files('libs/TripPricer.jar')
 }
 
-test {
-    useJUnitPlatform()
-    finalizedBy jacocoTestReport
-}
-
 jacoco {
     toolVersion = '0.8.8'
-    reportsDirectory = file("$buildDir/reports/jacoco")
+    //reportsDirectory = file("$buildDir/reports/jacoco")
     //reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
+    reportsDirectory.set(layout.buildDirectory.dir("customJacocoReportDir"))
 }
 
-jacocoTestReport {
-    dependsOn test
+test {
+    useJUnitPlatform()
+   // finalizedBy jacocoTestReport
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test) // tests are required to run before generating the report
+}
+
+tasks.jacocoTestReport {
     reports {
         xml.required = false
         csv.required = false
         html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+        //html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
     }
 }
+
+check.dependsOn jacocoTestCoverageVerification
 
 jacocoTestCoverageVerification {
     violationRules {

@@ -7,6 +7,7 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -16,16 +17,17 @@ import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
 import rewardCentral.RewardCentral;
 import tourGuide.dto.NearAttractionDTO;
+import tourGuide.dto.UserPreferencesDTO;
 import tourGuide.exception.UserAlreadyExistException;
 import tourGuide.exception.UserNotFoundException;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.helper.AttractionLocalDistance;
 import tourGuide.tracker.Tracker;
 import tourGuide.user.User;
+import tourGuide.user.UserPreferences;
 import tourGuide.user.UserReward;
 import tripPricer.Provider;
 import tripPricer.TripPricer;
-
 
 
 import static java.util.stream.Collectors.toMap;
@@ -40,7 +42,6 @@ public class TourGuideService {
     public final Tracker tracker;
     boolean testMode = true;
     private final ExecutorService trackUserExecutorService = Executors.newFixedThreadPool(100);
-
 
 
     public TourGuideService(GpsUtil gpsUtil, RewardsService rewardsService) {
@@ -68,8 +69,10 @@ public class TourGuideService {
         logger.info("Retrieve successfully user lastVisitedLocation if exists, if not track user current location");
         return visitedLocation;
     }
+
     /**
      * Retrieves a user by their username from the internal user map.
+     *
      * @param userName the username of the user to retrieve
      * @return the User object corresponding to the given username
      * @throws UserNotFoundException if a user with the given username does not exist in the internal user map
@@ -112,7 +115,6 @@ public class TourGuideService {
     }
 
 
-
     /**
      * Return the Map of all current locations of all users. Key is userId, value is Location
      *
@@ -125,9 +127,9 @@ public class TourGuideService {
     }
 
     /**
-     *
      * Gets trip deals for the specified user based on their preferences and reward points.
      * Calls tripPricer service, to retrieve available trip deals.
+     *
      * @param user User
      * @return A list of Provider objects containing information about available trip deals.
      */
@@ -144,6 +146,7 @@ public class TourGuideService {
     /**
      * Asynchronously tracks a user's location and updates the visited locations list.
      * It also calculates the user's rewards for visiting the location and returns the current visited location.
+     *
      * @param user the user whose location is being tracked
      * @return CompletableFuture VisitedLocation that supplies the user's current visited location
      */
@@ -161,12 +164,15 @@ public class TourGuideService {
                     return visitedLocation;
                 }, trackUserExecutorService);
     }
+
     /**
      * Get the list of the nearest 5 attractions from a given location
+     *
      * @param visitedLocation the location visited by the user
      * @return the list of the 5 nearest attractions
      */
     public List<NearAttractionDTO> getNearByAttractions(VisitedLocation visitedLocation) {
+        logger.debug("getNear5ByAttractions method starts here, from TourGuideService");
         int attractionsNearest = 5;
         return gpsUtil.getAttractions()
                 .stream()
@@ -176,7 +182,25 @@ public class TourGuideService {
                 .map(attraction -> new NearAttractionDTO(attraction, visitedLocation, attraction, new RewardCentral()))
                 .collect(Collectors.toList());
     }
+    /**
+     * Updates the user preferences of a given user.
+     * @param userName userName
+     * @param userPreferencesDTO the new user preferences
+     */
+    public void updateUserPreferences(String userName, UserPreferencesDTO userPreferencesDTO) {
+        logger.debug("updateUserPreferences method starts here, from TourGuideService");
 
+        User user = getUser(userName);
+        UserPreferences userPreferences = user.getUserPreferences();
+
+        userPreferences.setAttractionProximity(userPreferencesDTO.getAttractionProximity());
+        userPreferences.setHighPricePoint(Money.of(userPreferencesDTO.getHighPricePoint(), userPreferences.getCurrency()));
+        userPreferences.setLowerPricePoint(Money.of(userPreferencesDTO.getLowerPricePoint(), userPreferences.getCurrency()));
+        userPreferences.setNumberOfAdults(userPreferencesDTO.getNumberOfAdults());
+        userPreferences.setNumberOfChildren(userPreferencesDTO.getNumberOfChildren());
+        userPreferences.setTripDuration(userPreferencesDTO.getTripDuration());
+        userPreferences.setTicketQuantity(userPreferencesDTO.getTicketQuantity());
+    }
 
     private void addShutDownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(tracker::stopTracking));
@@ -227,5 +251,4 @@ public class TourGuideService {
         LocalDateTime localDateTime = LocalDateTime.now().minusDays(new Random().nextInt(30));
         return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
     }
-
 }

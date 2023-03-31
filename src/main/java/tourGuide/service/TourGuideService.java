@@ -151,14 +151,14 @@ public class TourGuideService {
      * @return CompletableFuture VisitedLocation that supplies the user's current visited location
      */
     public CompletableFuture<VisitedLocation> trackUserLocation(User user) {
-        //logger.debug("trackUserLocation from TourGuideService, user:{}, currentThread: {}", user.getUserName(), Thread.currentThread().getName());
+       // logger.debug("trackUserLocation from TourGuideService, user:{}, currentThread: {}", user.getUserName(), Thread.currentThread().getName());
         return CompletableFuture.supplyAsync(() -> {
-                   // logger.debug(Thread.currentThread().getName() + " is working");
+                   //logger.debug(Thread.currentThread().getName() + " is working");
            return gpsUtil.getUserLocation(user.getUserId());
                         }, trackUserExecutorService)
 
                 .thenApplyAsync(visitedLocation -> {
-                    //logger.debug("addToVisitedLocation, user: {}, currentThread: {}", user.getUserName(), Thread.currentThread().getName());
+                   // logger.debug("addToVisitedLocation, user: {}, currentThread: {}", user.getUserName(), Thread.currentThread().getName());
                     user.addToVisitedLocations(visitedLocation);
                         rewardsService.calculateRewards(user);
                     return visitedLocation;

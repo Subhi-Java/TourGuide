@@ -23,7 +23,7 @@ public class RewardsService {
 
     // proximity in miles
     private final int defaultProximityBuffer = 10;
-    private int proximityBuffer = defaultProximityBuffer;
+    private int proximityBuffer = defaultProximityBuffer; // 5000, 10000;
     private final int attractionProximityRange = 200;
     private final GpsUtil gpsUtil;
     private final RewardCentral rewardsCentral;
@@ -53,6 +53,7 @@ public class RewardsService {
      * Finally, the method waits for all the CompletableFuture objects to complete before returning.
      */
     public void calculateRewards(User user) {
+        //logger.debug("calculateRewards starts here, from RewardsService");
         List<VisitedLocation> userLocations = user.getVisitedLocations();
 
         List<Attraction> attractions = gpsUtil.getAttractions();

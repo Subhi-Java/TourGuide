@@ -1,22 +1,26 @@
 package tourGuide;
 
+import com.jsoniter.output.JsonStream;
+import gpsUtil.location.Location;
+import gpsUtil.location.VisitedLocation;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import tourGuide.dto.UserPreferencesDTO;
+import tourGuide.service.TourGuideService;
+import tourGuide.user.User;
+import tourGuide.user.UserReward;
+import tripPricer.Provider;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import gpsUtil.location.Location;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import com.jsoniter.output.JsonStream;
-
-import gpsUtil.location.VisitedLocation;
-import tourGuide.dto.UserPreferencesDTO;
-import tourGuide.service.TourGuideService;
-import tourGuide.user.User;
-import tripPricer.Provider;
 
 @RestController
 public class TourGuideController {
@@ -68,10 +72,15 @@ public class TourGuideController {
      * @param userName the userName
      * @return a JSON string representing the rewards of the user
      */
-    @RequestMapping("/getRewards")
+  /*  @RequestMapping("/getRewards")
     public String getRewards(@RequestParam String userName) {
         logger.debug("getRewards method starts here, form TourGuideController");
         return JsonStream.serialize(tourGuideService.getUserRewards(getUser(userName)));
+    }*/
+    @RequestMapping("/getRewards")
+    public List<UserReward> getRewards(@RequestParam String userName) {
+        logger.debug("getRewards method starts here, form TourGuideController");
+        return tourGuideService.getUserRewards(getUser(userName));
     }
     /**
      * Method returns a JSON string representation of all current locations of all users.
@@ -90,18 +99,18 @@ public class TourGuideController {
      * @param userName the UserName
      * @return a JSON string containing the trip deals for the user
      */
-    @RequestMapping("/getTripDeals")
+   /* @RequestMapping( "/getTripDeals")
     public String getTripDeals(@RequestParam String userName) {
         logger.debug("getTripDeals method starts here, form TourGuideController");
         List<Provider> providers = tourGuideService.getTripDeals(getUser(userName));
         return JsonStream.serialize(providers);
-    }
- /*   @RequestMapping("/getTripDeals")
+    }*/
+    @RequestMapping("/getTripDeals")
     public List<Provider> getTripDeals(@RequestParam String userName) {
         logger.debug("getTripDeals method starts here, form TourGuideController");
         List<Provider> providers = tourGuideService.getTripDeals(getUser(userName));
         return providers;
-    }*/
+    }
     /**
      * Updates the user preferences for a given user.
      * @param userName username
@@ -123,5 +132,11 @@ public class TourGuideController {
         User userByUserName = tourGuideService.getUser(userName);
         logger.info("User is successfully retrieved by username: {}, from TourGuideController", userName);
         return userByUserName;
+    }
+    @RequestMapping("/users")
+    private List<User> getAllUser() {
+        List<User> users = tourGuideService.getAllUsers();
+        logger.info("Users are successfully retrieved, from TourGuideController");
+        return users;
     }
 }

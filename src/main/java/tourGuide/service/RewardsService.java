@@ -27,6 +27,11 @@ public class RewardsService {
     private final int attractionProximityRange = 200;
     private final GpsUtil gpsUtil;
     private final RewardCentral rewardsCentral;
+
+    public ExecutorService getCalculateExecutorService() {
+        return calculateExecutorService;
+    }
+
     private final ExecutorService calculateExecutorService = Executors.newFixedThreadPool(100);
 
     public RewardsService(GpsUtil gpsUtil, RewardCentral rewardCentral) {

@@ -41,6 +41,11 @@ public class TourGuideService {
     private final TripPricer tripPricer = new TripPricer();
     public final Tracker tracker;
     boolean testMode = true;
+
+    public ExecutorService getTrackUserExecutorService() {
+        return trackUserExecutorService;
+    }
+
     private final ExecutorService trackUserExecutorService = Executors.newFixedThreadPool(100);
 
 

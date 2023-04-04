@@ -42,7 +42,7 @@ build:
 test-coverage:
   stage: test-coverage
   script:
-    - 'gradle clean test jacocoTestReport'
+    - ./gradlew clean test jacocoTestReport
   artifacts:
     paths:
       - build/jacocoHtml
